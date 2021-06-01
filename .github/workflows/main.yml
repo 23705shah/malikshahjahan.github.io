@@ -1,38 +1,27 @@
-# This is a basic workflow to help you get started with Actions
-
-name: ShahJahan_JOB
-
-# Controls when the action will run. 
+name: Deployment
 on:
   push:
-    branches: [main]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  deploy:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    strategy:
+      matrix:
+        node-version: [12.x]
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - name: Use Node.js 12
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - run: npm install
-      - run: npm run build
-      
-      - name: Deployment
-        uses: JamesIves/github-pages-deploy-action@3.6.2
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: build
-
-      
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install Packages
+      run: npm install
+    - name: Build page
+      run: npm run build
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@3.6.2
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: build # The folder the action should deploy.
